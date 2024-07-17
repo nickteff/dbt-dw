@@ -1,0 +1,4 @@
+dbt-core
+dbt-sqlserver
+sqlfluff
+sqlfluff-templater-dbt
