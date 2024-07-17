@@ -1,0 +1,31 @@
+version: 2 
+
+seeds: 
+  - name: salesorderheader
+    description: contains sales data between 2011-01-01 to 2011-12-31.  
+    config: 
+      schema: sales
+      column_types: 
+        salesorderid: integer
+        shipmethodid: integer
+        billtoaddressid: integer
+        modifieddate: datetime
+        rowguid: varchar(255)
+        taxamt: numeric(18, 2)
+        shiptoaddressid: integer
+        onlineorderflag: varchar(255)
+        territoryid: integer
+        status: smallint
+        orderdate: datetime
+        creditcardapprovalcode: varchar(255)
+        subtotal: numeric(18, 2)
+        creditcardid: integer
+        currencyrateid: integer
+        revisionnumber: smallint
+        freight: numeric(18, 4)
+        duedate: datetime
+        totaldue: numeric(18, 2)
+        customerid: integer
+        salespersonid: integer
+        shipdate: datetime
+        accountnumber: varchar(255)
