@@ -13,7 +13,23 @@ steps:
 - script: echo Hello, $(NAME)!
   displayName: 'Run a one-line script'
 
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.11'
+
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    python -m pip install --upgrade pip==20.1 setuptools>=40.1.0 wheel
+    python -m pip install dbt-sqlserver
+  displayName: 'dbt-sqlserver install'
+
+- task: AzureCLI@2
+  displayName: 'dbt debug'
+  inputs:
+    azureSubscription: mi-uica-demo
+    ScriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      cd adventureworks
+      dbt --version
+      dbt debug
+
