@@ -2,9 +2,14 @@
 
 # dbt dimensional modelling tutorial
 
+
 Welcome to the tutorial on building a Kimball dimensional model with dbt. 
 
 This tutorial is also featured on the [dbt developer blog](https://docs.getdbt.com/blog/kimball-dimensional-model).
+
+## Before you begin  
+
+This is a clone of the repo [dbt-dimensional-modelling](https://github.com/Data-Engineer-Camp/dbt-dimensional-modelling).  I have adapted it to work with SQL server, so the docs below are not up to date.  It contains a demonstration dbt project in the adventureworks directory.  This is further enhanced by demonstrating how this can be deployed using an Azure SQL database and Azure DevOps. 
 
 ## Table of Contents 
 
