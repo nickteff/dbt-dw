@@ -25,7 +25,7 @@ steps:
 - task: AzureCLI@2
   displayName: 'dbt debug'
   inputs:
-    azureSubscription: nickteff123
+    azureSubscription: devops-sp-demo
     ScriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
