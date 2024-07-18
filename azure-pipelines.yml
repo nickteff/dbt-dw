@@ -17,7 +17,7 @@ steps:
   inputs:
     versionSpec: '3.11'
 
-- script: sudo apt-get install unixodbc
+- script: sudo apt-get install unixodbc-dev
   displayName: 'odbc driver'
 
 - script: |
