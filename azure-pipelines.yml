@@ -17,6 +17,9 @@ steps:
   inputs:
     versionSpec: '3.11'
 
+- script: sudo apt-get install unixodbc
+  displayName: 'odbc driver'
+
 - script: |
     python -m pip install --upgrade pip==20.1 setuptools>=40.1.0 wheel
     python -m pip install dbt-sqlserver
