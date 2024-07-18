@@ -35,5 +35,6 @@ steps:
       cd adventureworks
       dbt --version
       dbt debug
+      dbt deps
       dbt test
 
