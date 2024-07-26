@@ -1,11 +1,10 @@
 version: 2 
 
 seeds: 
-  - name: productsubcategory
+  - name: productcategory
     config: 
-      schema: production
+      schema: raw
       column_types: 
-        productsubcategoryid: integer
         productcategoryid: integer
         name: varchar(255)
         modifieddate: datetime
