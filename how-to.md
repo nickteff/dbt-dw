@@ -4,12 +4,20 @@
 
 [Blog post](https://devblogs.microsoft.com/azure-sql/devops-for-azure-sql/)
 
-SQL server and SQL DB that can be queried 
-Create a devops org and project
-connect the devops org to the directory
-create the dbt repo add in the azure pipeline yaml
-use azure cli to handle user auth for testing
-add managed identity to the devops org and sql server
+# Project Set Up
+1. SQL server and SQL DB 
+    * Make Sure the SQL DB has firewall rules that allows for query access
+2. Create a devops org and project
+3. connect the devops org to the directory
+4. create the dbt repo add in the azure pipeline yaml
+5. use azure cli to handle user auth for testing
+6. In the Azure DevOps Project add a Service Connection
+    * Project Settings --> Service Connection
+    * Hit New Service Connection Button
+    * Azure Resource Manager --> Workload Identity federation (auto/recommended)
+        * This will create an App Registration in the Azure Portal
+        * Rename it if you wish
+        * give it permissions for the sql server
 
 ### Hotfix Directory
 Add macro in `macros/dbt_utils/sql/generate_surrogate_key.sql`
