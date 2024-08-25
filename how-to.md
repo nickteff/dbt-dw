@@ -1,37 +1,49 @@
-[DevOps Getting Started](https://www.youtube.com/watch?v=j7OnxOz7YDY)
+# DevOps for Azure SQL and dbt Project Setup
 
-[ADO version](https://www.youtube.com/watch?v=G7H6HbzwAfs)
+## Resources
+- [DevOps Getting Started (Video)](https://www.youtube.com/watch?v=j7OnxOz7YDY)
+- [Azure DevOps Version (Video)](https://www.youtube.com/watch?v=G7H6HbzwAfs)
+- [Microsoft Blog Post](https://devblogs.microsoft.com/azure-sql/devops-for-azure-sql/)
 
-[Blog post](https://devblogs.microsoft.com/azure-sql/devops-for-azure-sql/)
+## Project Setup Steps
 
-# Project Set Up
-1. SQL server and SQL DB 
-    * Make Sure the SQL DB has firewall rules that allows for query access
-2. Create a devops org and project
-3. connect the devops org to the directory
-4. create the dbt repo add in the azure pipeline yaml
-5. use azure cli to handle user auth for testing
-6. In the Azure DevOps Project add a Service Connection
-    * Project Settings --> Service Connection
-    * Hit New Service Connection Button
-    * Azure Resource Manager --> Workload Identity federation (auto/recommended)
-        * This will create an App Registration in the Azure Portal
-        * Rename it if you wish
-        * give it permissions for the sql server
+1. **Azure SQL Setup**
+   - Create SQL Server and SQL Database
+   - Configure firewall rules to allow query access
 
-### Hotfix Directory
-Add macro in `macros/dbt_utils/sql/generate_surrogate_key.sql`
+2. **Azure DevOps Configuration**
+   - Create a DevOps organization and project
+   - Connect the organization to your Azure Active Directory
 
-See [Issue 97](https://github.com/dbt-msft/tsql-utils/issues/97) and related [PR](https://github.com/dbt-msft/tsql-utils/pull/98)
+3. **dbt Repository Preparation**
+   - Create a dbt repository in Azure DevOps
+   - Add Azure Pipelines YAML file to the repository
 
+4. **Authentication Setup**
+   - Use Azure CLI for user authentication during testing
 
-## Create a static documentation `index.html`
+5. **Service Connection Configuration**
+   - In Azure DevOps Project: Project Settings > Service Connections
+   - Create a new "Azure Resource Manager" connection with Workload Identity Federation
+   - This process:
+     - Creates an App Registration in Azure Portal
+     - Allows renaming of the App Registration (optional)
+     - Requires granting necessary permissions for SQL Server to the App Registration
 
-[Medium Page](https://medium.com/@connormcshane/how-to-deploy-dbt-docs-to-github-pages-using-github-actions-4f1774680155)
+## Additional Configuration
 
-[Other reference](https://data-banana.github.io/dbt-generate-doc-in-one-static-html-file.html)
+### Hotfix for Surrogate Key Generation
+- Add macro in `tsql_utils/macros/dbt_utils/sql/generate_surrogate_key.sql`
+- Reference: [Issue 97](https://github.com/dbt-msft/tsql-utils/issues/97) and [PR 98](https://github.com/dbt-msft/tsql-utils/pull/98)
 
-[Comment Update](https://data-banana.github.io/dbt-generate-doc-in-one-static-html-file.html)
+## Static Documentation Generation
 
-Add the `docs_to_spa.py` file and run it.  This inputs the needed contents from two json files into the `index.html` file so that it can be hosted as a static website e.g. of GitHub.
+### Creating a Static `index.html` for dbt Docs
+1. Add the `docs_to_spa.py` script to your project
+2. Run the script to generate a static `index.html`
+   - This combines content from two JSON files into a single HTML file
+   - Allows hosting as a static website (e.g., on GitHub Pages)
 
+### Resources for Static Documentation
+- [Deploying dbt Docs to GitHub Pages](https://medium.com/@connormcshane/how-to-deploy-dbt-docs-to-github-pages-using-github-actions-4f1774680155)
+- [Generate dbt Doc in One Static HTML File](https://data-banana.github.io/dbt-generate-doc-in-one-static-html-file.html)

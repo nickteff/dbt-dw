@@ -15,7 +15,15 @@ explore: fct_order {
 }
 ```
 
-If your BI tool doesn’t have a semantic layer that supports relationships, then you will have to reflect that relationship by creating a One Big Table (OBT) that joins the fact table against all of its dimension tables. 
+In Power BI, for example, you can define relationships in the model view:
+
+1. Import your fact and dimension tables.
+2. In the "Model" view, drag the key fields to create relationships between tables.
+3. Set the cardinality (e.g., Many to One) and cross-filter direction as needed.
+
+Power BI will then use these relationships to automatically generate correct joins when creating visualizations.
+
+If your BI tool doesn't have a semantic layer that supports relationships, then you will have to reflect that relationship by creating a One Big Table (OBT) that joins the fact table against all of its dimension tables. 
 
 ```sql
 with f_sales as (
@@ -47,15 +55,15 @@ d_date as (
 )
 
 select
-    {{ dbt_utils.star(from=ref('fct_sales'), relation_alias='f_sales', except=[
+    {{ tsql_utils.star(from=ref('fct_sales'), relation_alias='f_sales', except=[
         "product_key", "customer_key", "creditcard_key", "ship_address_key", "order_status_key", "order_date_key"
     ]) }},
-    {{ dbt_utils.star(from=ref('dim_product'), relation_alias='d_product', except=["product_key"]) }},
-    {{ dbt_utils.star(from=ref('dim_customer'), relation_alias='d_customer', except=["customer_key"]) }},
-    {{ dbt_utils.star(from=ref('dim_credit_card'), relation_alias='d_credit_card', except=["creditcard_key"]) }},
-    {{ dbt_utils.star(from=ref('dim_address'), relation_alias='d_address', except=["address_key"]) }},
-    {{ dbt_utils.star(from=ref('dim_order_status'), relation_alias='d_order_status', except=["order_status_key"]) }},
-    {{ dbt_utils.star(from=ref('dim_date'), relation_alias='d_date', except=["date_key"]) }}
+    {{ tsql_utils.star(from=ref('dim_product'), relation_alias='d_product', except=["product_key"]) }},
+    {{ tsql_utils.star(from=ref('dim_customer'), relation_alias='d_customer', except=["customer_key"]) }},
+    {{ tsql_utils.star(from=ref('dim_credit_card'), relation_alias='d_credit_card', except=["creditcard_key"]) }},
+    {{ tsql_utils.star(from=ref('dim_address'), relation_alias='d_address', except=["address_key"]) }},
+    {{ tsql_utils.star(from=ref('dim_order_status'), relation_alias='d_order_status', except=["order_status_key"]) }},
+    {{ tsql_utils.star(from=ref('dim_date'), relation_alias='d_date', except=["date_key"]) }}
 from f_sales
 left join d_product on f_sales.product_key = d_product.product_key
 left join d_customer on f_sales.customer_key = d_customer.customer_key
@@ -67,7 +75,7 @@ left join d_date on f_sales.order_date_key = d_date.date_key
 
 In the OBT above, we perform joins between the fact and dimension tables using the surrogate keys. 
 
-Using `dbt_utils.star()`, we select all columns except the surrogate key columns since the surrogate keys don't hold any meaning besides being useful for the joins. 
+Using `tsql_utils.star()`, we select all columns except the surrogate key columns since the surrogate keys don't hold any meaning besides being useful for the joins. 
 
 We can then build the OBT by running `dbt run`. Your dbt DAG should now look like this: 
 
