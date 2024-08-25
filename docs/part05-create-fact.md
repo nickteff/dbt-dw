@@ -4,7 +4,7 @@ After we have created all required dimension tables, we can now create the fact 
 
 ### Step 1: Create model files
 
-Let’s create the new dbt model files that will contain our transformation code. Under [adventureworks/models/marts](../adventureworks/models/marts), create two files: 
+Let's create the new dbt model files that will contain our transformation code. Under [adventureworks/models/marts](../adventureworks/models/marts), create two files: 
 
 - `fct_sales.sql` : This file will contain our SQL transformation code.
 - `fct_sales.yml` : This file will contain our documentation and tests for `fct_sales` .
@@ -18,7 +18,7 @@ adventureworks/models/
 
 ### Step 2: Fetch data from the upstream tables
 
-To answer the business questions, we need columns from both `salesorderheader` and `salesorderdetail`. Let’s reflect that in `fct_sales.sql` : 
+To answer the business questions, we need columns from both `salesorderheader` and `salesorderdetail`. Let's reflect that in `fct_sales.sql` : 
 
 ```sql
 with stg_salesorderheader as (
@@ -61,14 +61,14 @@ inner join stg_salesorderheader on stg_salesorderdetail.salesorderid = stg_sales
 
 ### Step 4: Create the surrogate key
 
-Next, we create the surrogate key to uniquely identify each row in the fact table. Each row in the `fct_sales` table can be uniquely identified by the `salesorderid` and the `salesorderdetailid` which is why we use both columns in the `generate_surrogate_key()` macro. 
+Next, we create the surrogate key to uniquely identify each row in the fact table. Each row in the `fct_sales` table can be uniquely identified by the `salesorderid` and the `salesorderdetailid` which is why we use both columns in the `sqlserver__generate_surrogate_key()` macro. 
 
 ```sql
 ... 
 
 select
-    {{ dbt_utils.generate_surrogate_key(['stg_salesorderdetail.salesorderid', 'salesorderdetailid']) }} as sales_key,
-		... 
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['stg_salesorderdetail.salesorderid', 'salesorderdetailid']) }} as sales_key,
+    ... 
 from stg_salesorderdetail
 inner join stg_salesorderheader on stg_salesorderdetail.salesorderid = stg_salesorderheader.salesorderid
 ```
@@ -81,7 +81,7 @@ You can now select the fact table columns that will help us answer the business 
 ...
 
 select
-    {{ dbt_utils.generate_surrogate_key(['stg_salesorderdetail.salesorderid', 'salesorderdetailid']) }} as sales_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['stg_salesorderdetail.salesorderid', 'salesorderdetailid']) }} as sales_key,
     stg_salesorderdetail.salesorderid,
     stg_salesorderdetail.salesorderdetailid,
     stg_salesorderdetail.unitprice,
@@ -95,19 +95,19 @@ inner join stg_salesorderheader on stg_salesorderdetail.salesorderid = stg_sales
 
 We want to be able to slice and dice our fact table against the dimension tables we have created in the earlier step. So we need to create the foreign surrogate keys that will be used to join the fact table back to the dimension tables. 
 
-We achieve this by applying the `generate_surrogate_key()` macro to the same unique id columns that we had previously used when generating the surrogate keys in the dimension tables. 
+We achieve this by applying the `sqlserver__generate_surrogate_key()` macro to the same unique id columns that we had previously used when generating the surrogate keys in the dimension tables. 
 
 ```sql
 ...
 
 select
-    {{ dbt_utils.generate_surrogate_key(['stg_salesorderdetail.salesorderid', 'salesorderdetailid']) }} as sales_key,
-    {{ dbt_utils.generate_surrogate_key(['productid']) }} as product_key,
-    {{ dbt_utils.generate_surrogate_key(['customerid']) }} as customer_key,
-    {{ dbt_utils.generate_surrogate_key(['creditcardid']) }} as creditcard_key,
-    {{ dbt_utils.generate_surrogate_key(['shiptoaddressid']) }} as ship_address_key,
-    {{ dbt_utils.generate_surrogate_key(['order_status']) }} as order_status_key,
-    {{ dbt_utils.generate_surrogate_key(['orderdate']) }} as order_date_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['stg_salesorderdetail.salesorderid', 'salesorderdetailid']) }} as sales_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['productid']) }} as product_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['customerid']) }} as customer_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['creditcardid']) }} as creditcard_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['shiptoaddressid']) }} as ship_address_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['order_status']) }} as order_status_key,
+    {{ tsql_utils.sqlserver__generate_surrogate_key(['orderdate']) }} as order_date_key,
     stg_salesorderdetail.salesorderid,
     stg_salesorderdetail.salesorderdetailid,
     stg_salesorderdetail.unitprice,

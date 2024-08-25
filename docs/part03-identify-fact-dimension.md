@@ -1,6 +1,6 @@
 ## Part 3: Identify the fact and dimension tables
 
-Based on the information provided from the earlier part, we want to create a dimensional model that represents that business’ Sales process and also be able to slice and dice the data by: 
+Based on the information provided from the earlier part, we want to create a dimensional model that represents that business' Sales process and also be able to slice and dice the data by: 
 
 - Product category and subcategory
 - Customer
@@ -25,7 +25,7 @@ There are two tables in the sales schema that catch our attention. These two tab
 
 *Sales Order Header and Detail*
 
-Let’s define a fact table called `fct_sales` which joins `sales.salesorderheader` and `sales.salesorderdetail` together. Each record in the fact table (also known as the [grain](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/grain/)) is an order detail.
+Let's define a fact table called `fct_sales` which joins `sales.salesorderheader` and `sales.salesorderdetail` together. Each record in the fact table (also known as the [grain](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/grain/)) is an order detail.
 
 ![](img/fct_sales.png)
 
@@ -74,13 +74,12 @@ Using the star schema approach, we can identify 6 dimensions as shown below that
 - `dim_customer` : a dimension table that joins `customer`, `person`, `store`
 - `dim_credit_card` : a dimension table created from `creditcard`
 - `dim_order_status` : a dimension table created by taking distinct statuses from `salesorderheader`
-- `dim_date` : a specially generated dimension table containing date attributes using the [dbt_date](https://hub.getdbt.com/calogica/dbt_date/latest/) package. 
+- `dim_date` : a dimension table created from a seed file
 
-*Note: We have manually seeded the `dim_date` table since DuckDB is not supported by the dbt_date package.*
-
+*Note: For Azure SQL Database, we'll continue to use the seed file to create the `dim_date` table. This approach provides us with a pre-generated date dimension containing various date attributes.*
 
 *Dimension tables*
 
-In the next part, we use dbt to create the fact and dimension tables we have identified. 
+In the next part, we'll use dbt to create the fact and dimension tables we have identified in Azure SQL Database, including the `dim_date` table generated from the seed file.
 
 [&laquo; Previous](part02-identify-business-process.md) [Next &raquo;](part04-create-dimension.md)

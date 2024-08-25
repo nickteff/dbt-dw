@@ -1,67 +1,86 @@
-## Part 1: Setup dbt project and database
+## Part 1: Setup dbt project and Azure SQL database
 
 ### Step 1: Before you get started
 
 Before you can get started: 
 
-- You must have either DuckDB or PostgreSQL installed. Choose one, and download and install the database using one of the following links:
-    - Download [DuckDB](https://duckdb.org/docs/installation/index)
-    - Download [PostgreSQL](https://www.postgresql.org/download/)
+- You must have an Azure account with an active subscription
 - You must have Python 3.8 or above installed
 - You must have dbt version 1.3.0 or above installed
 - You should have a basic understanding of [SQL](https://www.sqltutorial.org/)
 - You should have a basic understanding of [dbt](https://docs.getdbt.com/docs/quickstarts/overview)
 
-### Step 2: Clone the repository
+### Step 2: Set up Azure SQL Database
 
-Clone the [github repository](https://github.com/Data-Engineer-Camp/dbt-dimensional-modelling) by running this command in your terminal: 
+1. Log in to the Azure Portal
+2. Create a new Azure SQL Database
+3. Make note of your server name, database name, username, and password
+4. Configure Azure SQL Database firewall rules to allow access from your IP address
 
-```text
-git clone https://github.com/Data-Engineer-Camp/dbt-dimensional-modelling.git
-cd dbt-dimensional-modelling/adventureworks
-```
+### Step 3: Clone the repository
 
-### Step 3: Install dbt database adaptors
-
-Depending on which database you’ve chosen, install the relevant database adaptor for your database: 
+Clone the project repository by running this command in your terminal: 
 
 ```text
-# install adaptor for duckdb
-pip install dbt-duckdb
-
-# OR 
-
-# install adaptor for postgresql
-pip install dbt-postgres
+git clone https://github.com/nickteff/dbt-dw.git
+cd dbt-dw/adventureworks
 ```
 
-### Step 4: Setup dbt profile
+### Step 4: Install dbt database adaptor and ODBC Driver
 
-The dbt profile (see `adventureworks/profiles.yml`) has already been pre-configured for you. Verify that the configurations are set correctly based on your database credentials: 
+Install the `dbt-sqlserver` adaptor for Azure SQL Database:
+
+```text
+pip install dbt-sqlserver
+```
+
+If you don't already have the ODBC Driver for SQL Server installed, you can download it from the [Microsoft website](https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server).
+
+### Step 5: Setup dbt profile
+
+The `profiles.yml` file has already been configured in the `adventureworks` directory. Review and update it if necessary:
 
 ```yaml
 adventureworks:
-  target: duckdb # leave this as duckdb (default), or change this to your chosen database
-
-  # supported databases: duckdb, postgres 
+  target: dbt-demo
   outputs:
-    duckdb: 
-     type: duckdb
-     path: target/adventureworks.duckdb
-     threads: 12
-
-    postgres:  
-      type: postgres
-      host: localhost
-      user: postgres
-      password: postgres
-      port: 5432
-      dbname: adventureworks # create this empty database beforehand 
-      schema: dbo
-      threads: 12
+    dbt-demo:
+      type: sqlserver
+      driver: "ODBC Driver 17 for SQL Server"
+      server: "{{ env_var('SERVER') }}"
+      schema: "{{ env_var('SCHEMA') }}"
+      database: "{{ env_var('DB') }}"
+      authentication: CLI
+      port: 1433
+      encrypt: true
+      trust_cert: false
 ```
 
-### Step 5: Install dbt dependencies
+This configuration uses environment variables for sensitive information. Before running dbt commands, set the following environment variables:
+
+- `SERVER`: Your Azure SQL Server name (e.g., `your-server.database.windows.net`)
+- `SCHEMA`: The schema name (usually `dbo` for Azure SQL Database)
+- `DB`: Your database name
+
+You can set these environment variables in your terminal:
+
+```bash
+export SERVER=your-server.database.windows.net
+export SCHEMA=dbo
+export DB=your-database-name
+```
+
+For Windows, use:
+
+```cmd
+set SERVER=your-server.database.windows.net
+set SCHEMA=dbo
+set DB=your-database-name
+```
+
+Note that this configuration uses CLI authentication. Ensure you're logged in to Azure CLI and have the necessary permissions to access the database.
+
+### Step 6: Install dbt dependencies
 
 We use packages like [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) in this project, and we need to install the libraries for this package by running the command: 
 
@@ -69,19 +88,15 @@ We use packages like [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/lates
 dbt deps 
 ```
 
-### Step 6: Seed your database
+### Step 7: Seed your database
 
-We are using [dbt seeds](https://docs.getdbt.com/docs/build/seeds) (see `adventureworks/seeds/*`) to insert AdventureWorks data into your database: 
+We are using [dbt seeds](https://docs.getdbt.com/docs/build/seeds) (see `adventureworks/seeds/*`) to insert AdventureWorks data into your Azure SQL Database: 
 
 ```text
-# seed duckdb 
-dbt seed --target duckdb
-
-# seed postgres
-dbt seed --target postgres
+dbt seed --target dbt-demo
 ```
 
-### Step 7: Examine the database source schema
+### Step 8: Examine the database source schema
 
 All data generated by the business is stored on an OLTP database. The Entity Relationship Diagram (ERD) of the database has been provided to you. 
 
@@ -95,38 +110,40 @@ Examine the database source schema below, paying close attention to:
 
 *Source schema*
 
-### Step 8: Query the tables
+### Step 9: Query the tables
 
-Get a better sense of what the records look like by executing select statements using your database's SQL editor.
+Get a better sense of what the records look like by executing select statements using your Azure SQL Database's SQL editor.
 
 For example:  
 
 ```sql
-select * from sales.salesorderheader limit 10; 
+SELECT TOP 10 * FROM sales.salesorderheader;
 ```
 
 Output: 
 
 ```
-┌──────────────┬──────────────┬─────────────────┬───┬───────────────┬─────────────────────┬────────────────┐
-│ salesorderid │ shipmethodid │ billtoaddressid │ … │ salespersonid │      shipdate       │ accountnumber  │
-│    int32     │    int32     │      int32      │   │     int32     │      timestamp      │    varchar     │
-├──────────────┼──────────────┼─────────────────┼───┼───────────────┼─────────────────────┼────────────────┤
-│        43659 │            5 │             985 │ … │           279 │ 2011-06-07 00:00:00 │ 10-4020-000676 │
-│        43660 │            5 │             921 │ … │           279 │ 2011-06-07 00:00:00 │ 10-4020-000117 │
-│        43661 │            5 │             517 │ … │           282 │ 2011-06-07 00:00:00 │ 10-4020-000442 │
-│        43662 │            5 │             482 │ … │           282 │ 2011-06-07 00:00:00 │ 10-4020-000227 │
-│        43663 │            5 │            1073 │ … │           276 │ 2011-06-07 00:00:00 │ 10-4020-000510 │
-│        43664 │            5 │             876 │ … │           280 │ 2011-06-07 00:00:00 │ 10-4020-000397 │
-│        43665 │            5 │             849 │ … │           283 │ 2011-06-07 00:00:00 │ 10-4020-000146 │
-│        43666 │            5 │            1074 │ … │           276 │ 2011-06-07 00:00:00 │ 10-4020-000511 │
-│        43667 │            5 │             629 │ … │           277 │ 2011-06-07 00:00:00 │ 10-4020-000646 │
-│        43668 │            5 │             529 │ … │           282 │ 2011-06-07 00:00:00 │ 10-4020-000514 │
-├──────────────┴──────────────┴─────────────────┴───┴───────────────┴─────────────────────┴────────────────┤
-│ 10 rows                                                                             23 columns (6 shown) │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+SalesOrderID | ShipMethodID | BillToAddressID | ... | SalesPersonID |    ShipDate    | AccountNumber
+-------------|--------------|-----------------|-----|---------------|----------------|---------------
+    43659    |      5       |       985       | ... |      279      | 2011-06-07 ... | 10-4020-000676
+    43660    |      5       |       921       | ... |      279      | 2011-06-07 ... | 10-4020-000117
+    43661    |      5       |       517       | ... |      282      | 2011-06-07 ... | 10-4020-000442
+    43662    |      5       |       482       | ... |      282      | 2011-06-07 ... | 10-4020-000227
+    43663    |      5       |      1073       | ... |      276      | 2011-06-07 ... | 10-4020-000510
+    43664    |      5       |       876       | ... |      280      | 2011-06-07 ... | 10-4020-000397
+    43665    |      5       |       849       | ... |      283      | 2011-06-07 ... | 10-4020-000146
+    43666    |      5       |      1074       | ... |      276      | 2011-06-07 ... | 10-4020-000511
+    43667    |      5       |       629       | ... |      277      | 2011-06-07 ... | 10-4020-000646
+    43668    |      5       |       529       | ... |      282      | 2011-06-07 ... | 10-4020-000514
 ```
 
-When you’ve successfully set up the dbt project and database, we can now move into the next part to identify the tables required for a dimensional model. 
+When you've successfully set up the dbt project and Azure SQL Database, we can now move into the next part to identify the tables required for a dimensional model. 
 
 [&laquo; Previous](../README.md) [Next &raquo;](part02-identify-business-process.md)
+
+### Troubleshooting
+
+- Ensure your IP address is allowed in Azure SQL Database firewall rules
+- Verify that you have the correct ODBC driver installed for SQL Server
+- Check your Azure SQL Database connection string if you encounter connection issues
+- If you're having trouble with CLI authentication, ensure you're logged in to Azure CLI and have the necessary permissions to access the database

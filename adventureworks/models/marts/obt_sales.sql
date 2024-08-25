@@ -43,3 +43,4 @@ left join d_credit_card on f_sales.creditcard_key = d_credit_card.creditcard_key
 left join d_address on f_sales.ship_address_key = d_address.address_key
 left join d_order_status on f_sales.order_status_key = d_order_status.order_status_key
 left join d_date on f_sales.order_date_key = d_date.date_key
+
