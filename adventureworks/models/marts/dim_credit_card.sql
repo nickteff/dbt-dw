@@ -10,7 +10,7 @@ stg_creditcard as (
 )
 
 select
-    {{ tsql_utils.sqlserver__generate_surrogate_key(['stg_salesorderheader.creditcardid']) }} as creditcard_key,
+    {{ dbt_utils.generate_surrogate_key(['stg_salesorderheader.creditcardid']) }} as creditcard_key,
     stg_salesorderheader.creditcardid,
     stg_creditcard.cardtype
 from stg_salesorderheader
