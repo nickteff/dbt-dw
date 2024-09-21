@@ -1,5 +1,5 @@
 version: 2
-
+# just adding a comment
 models:
   - name: dim_address
     columns:
